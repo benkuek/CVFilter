@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { verifySession } from '@/lib/jwt';
+import logger from '@/lib/logger';
 
 const SESSION_COOKIE_NAME = 'session';
 
@@ -15,8 +16,8 @@ export async function GET(request: NextRequest) {
     if (session) {
       return NextResponse.json({ authenticated: true, ...session });
     }
-  } catch {
-    // Token invalid
+  } catch (error) {
+    logger.error('Session verification failed', { error: error instanceof Error ? error.message : 'Unknown error' });
   }
   
   return NextResponse.json({ authenticated: false });

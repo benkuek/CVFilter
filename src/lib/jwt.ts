@@ -1,5 +1,6 @@
 import { SignJWT, jwtVerify } from 'jose';
 import { NextRequest } from 'next/server';
+import logger from './logger';
 
 const JWT_SECRET = new TextEncoder().encode(process.env.AUTH_SECRET!);
 const JWT_ALGORITHM = 'HS256';
@@ -25,7 +26,8 @@ export async function verifySession(token: string): Promise<SessionData | null> 
   try {
     const { payload } = await jwtVerify(token, JWT_SECRET);
     return payload as SessionData;
-  } catch {
+  } catch (error) {
+    logger.error('JWT verification failed', { error: error instanceof Error ? error.message : 'Unknown error' });
     return null;
   }
 }
