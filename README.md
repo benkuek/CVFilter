@@ -34,3 +34,24 @@ You can check out [the Next.js GitHub repository](https://github.com/vercel/next
 The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
 
 Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+
+
+## Design Reference
+
+### Frontend
+- **Framework:** React via Next.js
+- **Deployment:** Provider agnostic static web application, target Vercel hosting for testing.
+- **Styling:** Tailwind CSS
+
+### Authentication
+- **Deployment:** Provider agnostic API routes via Next.js serverless functions
+- **Protocol:** OpenID Connect (OIDC)
+- **Library:** openid-client in API routes
+- **Session:** JWT cookies (secure, httpOnly, stateless)
+- **Provider:** Auth0
+
+### Security
+- Stateless JWT tokens
+- Secure cookie configuration
+- CSRF protection via SameSite cookies
+- PKCE for OAuth2 authorization code flow
