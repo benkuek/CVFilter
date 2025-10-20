@@ -28,6 +28,7 @@ export async function GET() {
       secure: process.env.NODE_ENV === 'production',
       sameSite: 'lax',
       maxAge: STATE_COOKIE_MAX_AGE,
+      path: '/',
     });
     
     return response;
