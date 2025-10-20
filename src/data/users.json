@@ -1,0 +1,6 @@
+{
+  "AdminEmail": {
+    "email": "an administrator's email",
+    "roles": ["admin"]
+  }
+}

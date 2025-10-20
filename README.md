@@ -55,3 +55,18 @@ Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/bui
 - Secure cookie configuration
 - CSRF protection via SameSite cookies
 - PKCE for OAuth2 authorization code flow
+
+### Authorization
+- **Storage:** Local database for user roles (provider agnostic).
+- **Role Mapping:** OIDC user ID (sub) to local roles on login
+- **Integration:** Middleware for route protection and role checks
+- **Decision Logic:** Simple role-based access control
+- **Decision Point:** API routes and page components
+- **Role Management:** Admin API routes for role assignment
+- **Session Enhancement:** Include roles in JWT claims after local lookup
+- **Migration Ready:** Authorization logic independent of OIDC provider
+
+optionally install
+```bash
+npm install @aws-sdk/client-dynamodb @aws-sdk/lib-dynamodb
+```

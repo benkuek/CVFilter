@@ -6,6 +6,7 @@ interface SessionData {
   sub: string;
   email?: string;
   name?: string;
+  roles?: string[];
 }
 
 export default function AuthButton() {
@@ -40,7 +41,12 @@ export default function AuthButton() {
   if (session) {
     return (
       <div className="flex items-center gap-4">
-        <p>Signed in as {session.email}</p>
+        <div>
+          <p>Signed in as {session.email}</p>
+          {session.roles && session.roles.length > 0 && (
+            <p className="text-sm text-gray-600">Roles: {session.roles.join(', ')}</p>
+          )}
+        </div>
         <button 
           onClick={handleLogout}
           className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent font-medium text-sm h-10 px-4"
