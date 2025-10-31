@@ -25,10 +25,24 @@ export default function JobMatcher() {
   const extractSkills = async (text: string) => {
     log('🔍 Extracting skills from:', text.substring(0, 100) + '...');
     
-    const response = await fetch('/api/cv-graph');
-    const cvGraph = await response.json();
-    const skillNodes = cvGraph.nodes.filter((n: Node) => n.type === 'skill');
-    const stackNodes = cvGraph.nodes.filter((n: Node) => n.type === 'stack');
+    try {
+      const response = await fetch('/api/cv-graph/');
+      if (!response.ok) {
+        throw new Error(`API failed: ${response.status}`);
+      }
+      const cvGraph = await response.json();
+      
+      if (!cvGraph || !cvGraph.nodes) {
+        throw new Error('Invalid CV data structure');
+      }
+      
+      const skillNodes = cvGraph.nodes.filter((n: Node) => n.type === 'skill');
+      const stackNodes = cvGraph.nodes.filter((n: Node) => n.type === 'stack');
+      
+      if (skillNodes.length === 0) {
+        console.warn('No skill nodes found in CV data');
+        return [];
+      }
     
     const allSkills = [
       ...skillNodes.map((n: Node) => n.label || ''),
@@ -106,15 +120,28 @@ export default function JobMatcher() {
     const result = Array.from(foundSkills);
     log('🎯 Final extracted skills:', result);
     return result;
+    } catch (error) {
+      console.error('Error extracting skills:', error);
+      return [];
+    }
   };
 
 
 
   const calculateMatch = async (requiredSkills: string[]) => {
-    const response = await fetch('/api/cv-graph');
-    const cvGraph = await response.json();
-    const skillNodes = cvGraph.nodes.filter((n: Node) => n.type === 'skill');
-    const mySkills = skillNodes.map((s: Node) => s.label?.toLowerCase() || '');
+    try {
+      const response = await fetch('/api/cv-graph/');
+      if (!response.ok) {
+        throw new Error(`API failed: ${response.status}`);
+      }
+      const cvGraph = await response.json();
+      
+      if (!cvGraph || !cvGraph.nodes) {
+        throw new Error('Invalid CV data structure');
+      }
+      
+      const skillNodes = cvGraph.nodes.filter((n: Node) => n.type === 'skill');
+      const mySkills = skillNodes.map((s: Node) => s.label?.toLowerCase() || '');
     
     const matchedSkills = requiredSkills.filter(skill => 
       mySkills.some((mySkill:string) => 
@@ -128,6 +155,14 @@ export default function JobMatcher() {
       matchedSkills,
       missingSkills: requiredSkills.filter(skill => !matchedSkills.includes(skill))
     };
+    } catch (error) {
+      console.error('Error calculating match:', error);
+      return {
+        skillMatch: 0,
+        matchedSkills: [],
+        missingSkills: requiredSkills
+      };
+    }
   };
 
   const analyzeJob = async () => {
