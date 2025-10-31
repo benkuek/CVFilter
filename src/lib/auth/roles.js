@@ -1,4 +1,4 @@
-import { createStorage } from './storage.js';
+import { createStorage } from './storage';
 
 const storage = createStorage();
 

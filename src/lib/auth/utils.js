@@ -1,4 +1,4 @@
-import { getUserRoles } from './roles.js';
+import { getUserRoles } from './roles';
 
 const JWT_SECRET = new TextEncoder().encode(process.env.JWT_SECRET || 'your-secret-key');
 
