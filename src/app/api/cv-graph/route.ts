@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { CV_GRAPH } from '../../../data/cv-graph';
 
 // DynamoDB loader (optional)
 async function loadFromDynamoDB() {
@@ -33,13 +34,10 @@ export async function GET() {
       return NextResponse.json(cvGraph);
     }
     
-    // Default to file-based data - dynamically import only when needed
-    const { CV_GRAPH } = await import('../../../data/cv-graph');
+    // Default to file-based data
     return NextResponse.json(CV_GRAPH);
   } catch (error) {
     console.error('CV Graph API error:', error);
-    // Fallback to file data
-    const { CV_GRAPH } = await import('../../../data/cv-graph');
     return NextResponse.json(CV_GRAPH); // Fallback to file data
   }
 }
