@@ -1,6 +1,6 @@
 import fs from 'fs/promises';
 import path from 'path';
-import logger from '../logger.ts';
+import logger from '../logger';
 
 const USERS_FILE = path.join(process.cwd(), 'src', 'data', 'users.json');
 
