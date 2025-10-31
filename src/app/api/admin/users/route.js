@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { getAllUsers, setUserRoles } from '../../../lib/auth/roles';
+import { getAllUsers, setUserRoles } from '../../../lib/auth/roles.js';
 import logger from '../../../lib/logger';
 
 export async function GET() {
