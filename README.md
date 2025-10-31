@@ -70,3 +70,8 @@ optionally install
 ```bash
 npm install @aws-sdk/client-dynamodb @aws-sdk/lib-dynamodb
 ```
+
+### CV Data Source
+- **Storage Options:** Local JSON files for development, DynamoDB for production
+- **Data Structure:** Nodes and Links representing CV data
+

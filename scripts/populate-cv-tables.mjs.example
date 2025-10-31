@@ -1,0 +1,49 @@
+// node scripts/populate-cv-tables.mjs
+
+import { DynamoDBClient } from '@aws-sdk/client-dynamodb';
+import { DynamoDBDocumentClient, PutCommand } from '@aws-sdk/lib-dynamodb';
+
+const CV_GRAPH = {
+  nodes: [
+    { id: "me", type: "person", name: "Developer" },
+  ],
+  links: [
+    { from: "me", to: "senior-dev", type: "worked_on", weight: 0.9 },
+  ]
+};
+
+async function populateTables() {
+  const client = new DynamoDBClient({ region: process.env.AWS_REGION || 'ap-southeast-2' });
+  const docClient = DynamoDBDocumentClient.from(client);
+
+  const nodesTable = process.env.CV_NODES_TABLE || 'cv-nodes';
+  const linksTable = process.env.CV_LINKS_TABLE || 'cv-links';
+
+  try {
+    // Populate nodes
+    for (const node of CV_GRAPH.nodes) {
+      await docClient.send(new PutCommand({
+        TableName: nodesTable,
+        Item: node
+      }));
+      console.log(`Added node: ${node.id}`);
+    }
+
+    // Populate links
+    for (const link of CV_GRAPH.links) {
+      const linkItem = { id: `${link.from}-${link.to}`, ...link };
+      await docClient.send(new PutCommand({
+        TableName: linksTable,
+        Item: linkItem
+      }));
+      console.log(`Added link: ${linkItem.id}`);
+    }
+
+    console.log('Successfully populated CV tables');
+  } catch (error) {
+    console.error('Error populating tables:', error);
+    process.exit(1);
+  }
+}
+
+populateTables().catch(console.error);

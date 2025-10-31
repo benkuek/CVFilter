@@ -40,3 +40,8 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# private scripts
+/scripts/*.mjs
+
+/src/data/*.ts
