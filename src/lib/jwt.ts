@@ -5,7 +5,6 @@ import logger from './logger';
 const JWT_SECRET = new TextEncoder().encode(process.env.AUTH_SECRET!);
 const JWT_ALGORITHM = 'HS256';
 const SESSION_DURATION = process.env.SESSION_DURATION || '24h';
-const COOKIE_NAME = 'session';
 
 export interface SessionData {
   sub: string;
@@ -33,7 +32,7 @@ export async function verifySession(token: string): Promise<SessionData | null> 
 }
 
 export async function getSession(request: NextRequest): Promise<SessionData | null> {
-  const token = request.cookies.get(COOKIE_NAME)?.value;
+  const token = request.cookies.get(process.env.SESSION_COOKIE_NAME || 'session')?.value;
   
   if (!token) return null;
   

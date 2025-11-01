@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import logger from '@/lib/logger';
 
-const SESSION_COOKIE_NAME = 'session';
+const SESSION_COOKIE_NAME = process.env.SESSION_COOKIE_NAME || 'session';
 
 export async function POST() {
   try {
