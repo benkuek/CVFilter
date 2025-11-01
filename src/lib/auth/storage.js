@@ -75,6 +75,7 @@ export async function createStorage() {
     case 'dynamodb':
       return new DynamoStorage(process.env.DYNAMODB_TABLE);
     default:
+      throw new Error(`Unsupported storage type: ${storageType}`);
       // const { FileStorage } = await import('./file-storage.js');
       // return new FileStorage();
   }

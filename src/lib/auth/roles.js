@@ -12,7 +12,13 @@ async function getStorage() {
 export async function getUserRoles(email) {
   const storageInstance = await getStorage();
   const user = await storageInstance.getUser(email);
-  return user.roles;
+  
+  // Auto-create user with empty roles if not exists
+  if (!user.roles || user.roles.length === 0) {
+    await storageInstance.setUserRoles(email, []);
+  }
+  
+  return user.roles || [];
 }
 
 export async function setUserRoles(email, roles) {
