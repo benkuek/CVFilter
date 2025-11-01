@@ -6,13 +6,6 @@ import logger from './src/lib/logger';
 const JWT_SECRET = new TextEncoder().encode(process.env.AUTH_SECRET || 'your-secret-key');
 
 export async function middleware(request) {
-  const { pathname } = request.nextUrl;
-
-  // Skip middleware for public routes
-  if (pathname === '/' || pathname.startsWith('/api/auth') || pathname.startsWith('/api/session-check') || pathname.startsWith('/_next')) {
-    return NextResponse.next();
-  }
-
   try {
     const token = request.cookies.get(process.env.SESSION_COOKIE_NAME || 'session')?.value;
     
@@ -40,6 +33,6 @@ export async function middleware(request) {
 
 export const config = {
   matcher: [
-    '/((?!api/auth|api/session-check|_next/static|_next/image|favicon.ico).*)',
+    '/((?!api/auth|api/session-check|api/cv-graph|_next/static|_next/image|favicon.ico).*)',
   ],
 };
