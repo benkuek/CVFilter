@@ -43,11 +43,17 @@ class DynamoStorage extends UserStorage {
 
   async getUser(email) {
     const dynamodb = await this._getDynamoDB();
-    const result = await dynamodb.send(new this.GetCommand({
-      TableName: this.tableName,
-      Key: { email }
-    }));
-    return result.Item || { email, roles: [] };
+    try {
+      const result = await dynamodb.send(new this.GetCommand({
+        TableName: this.tableName,
+        Key: { email }
+      }));
+      return result.Item || { email, roles: [], _isNew: true };
+    } catch (error) {
+      // User doesn't exist, return default
+      logger.info('User not found in DynamoDB, returning default', { email });
+      return { email, roles: [], _isNew: true };
+    }
   }
 
   async setUserRoles(email, roles) {

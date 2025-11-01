@@ -13,8 +13,8 @@ export async function getUserRoles(email) {
   const storageInstance = await getStorage();
   const user = await storageInstance.getUser(email);
   
-  // Auto-create user with empty roles if not exists
-  if (!user.roles || user.roles.length === 0) {
+  // Auto-create user with empty roles if new
+  if (user._isNew) {
     await storageInstance.setUserRoles(email, []);
   }
   
