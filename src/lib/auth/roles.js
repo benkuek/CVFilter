@@ -1,14 +1,23 @@
 import { createStorage } from './storage';
 
-const storage = createStorage();
+let storage = null;
+
+async function getStorage() {
+  if (!storage) {
+    storage = await createStorage();
+  }
+  return storage;
+}
 
 export async function getUserRoles(email) {
-  const user = await storage.getUser(email);
+  const storageInstance = await getStorage();
+  const user = await storageInstance.getUser(email);
   return user.roles;
 }
 
 export async function setUserRoles(email, roles) {
-  await storage.setUserRoles(email, roles);
+  const storageInstance = await getStorage();
+  await storageInstance.setUserRoles(email, roles);
 }
 
 export async function hasRole(email, role) {
@@ -22,5 +31,6 @@ export async function hasAnyRole(email, requiredRoles) {
 }
 
 export async function getAllUsers() {
-  return await storage.getAllUsers();
+  const storageInstance = await getStorage();
+  return await storageInstance.getAllUsers();
 }

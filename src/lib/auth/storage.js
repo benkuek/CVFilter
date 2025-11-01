@@ -75,7 +75,7 @@ export async function createStorage() {
     case 'dynamodb':
       return new DynamoStorage(process.env.DYNAMODB_TABLE);
     default:
-      const { FileStorage } = await import('./file-storage.js');
-      return new FileStorage();
+      // const { FileStorage } = await import('./file-storage.js');
+      // return new FileStorage();
   }
 }
