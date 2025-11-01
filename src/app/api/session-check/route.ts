@@ -10,8 +10,11 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ authenticated: false });
   }
   
+  logger.info('Token found', { tokenLength: token.length, tokenStart: token.substring(0, 20) });
+  
   try {
     const session = await verifySession(token);
+    logger.info('Session verification result', { hasSession: !!session, email: session?.email });
     if (session) {
       const enhancedSession = await enhanceJWTWithRoles(session);
       return NextResponse.json({ authenticated: true, ...enhancedSession });
