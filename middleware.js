@@ -14,7 +14,7 @@ export async function middleware(request) {
   }
 
   try {
-    const token = request.cookies.get('auth-token')?.value;
+    const token = request.cookies.get(process.env.SESSION_COOKIE_NAME || 'session')?.value;
     
     if (!token) {
       return NextResponse.redirect(new URL('/api/auth/login', request.url));

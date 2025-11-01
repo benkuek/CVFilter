@@ -15,3 +15,12 @@ export async function enhanceJWTWithRoles(userPayload) {
     roles
   };
 }
+
+export function parseDuration(duration) {
+  if (!duration) return 60 * 60 * 24;
+  const match = duration.match(/^(\d+)([hmd])$/);
+  if (!match) return 60 * 60 * 24;
+  const [, num, unit] = match;
+  const multipliers = { m: 60, h: 60 * 60, d: 60 * 60 * 24 };
+  return parseInt(num) * multipliers[unit];
+}

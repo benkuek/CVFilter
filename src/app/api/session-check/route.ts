@@ -3,10 +3,8 @@ import { verifySession } from '@/lib/jwt';
 import { enhanceJWTWithRoles } from '@/lib/auth/utils';
 import logger from '@/lib/logger';
 
-const SESSION_COOKIE_NAME = 'session';
-
 export async function GET(request: NextRequest) {
-  const token = request.cookies.get(SESSION_COOKIE_NAME)?.value;
+  const token = request.cookies.get(process.env.SESSION_COOKIE_NAME || 'session')?.value;
   
   if (!token) {
     return NextResponse.json({ authenticated: false });

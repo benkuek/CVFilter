@@ -1,10 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createSession } from '@/lib/jwt';
+import { parseDuration } from '@/lib/auth/utils';
 import logger from '@/lib/logger';
-
-const STATE_COOKIE_NAME = 'oauth_state';
-const SESSION_COOKIE_NAME = 'session';
-const SESSION_COOKIE_MAX_AGE = 60 * 60 * 24; // 24 hours
 
 export async function GET(request: NextRequest) {
   try {
@@ -24,7 +21,7 @@ export async function GET(request: NextRequest) {
     }
 
     // Verify state
-    const storedState = request.cookies.get(STATE_COOKIE_NAME)?.value;
+    const storedState = request.cookies.get(process.env.OAUTH_STATE_COOKIE_NAME || 'oauth_state')?.value;
     
     if (!storedState || storedState !== state) {
       logger.error('State verification failed', { hasStoredState: !!storedState, stateMatch: storedState === state });
@@ -62,16 +59,16 @@ export async function GET(request: NextRequest) {
     const response = NextResponse.redirect(new URL('/', request.url));
     
     // Set session cookie
-    response.cookies.set(SESSION_COOKIE_NAME, sessionToken, {
+    response.cookies.set(process.env.SESSION_COOKIE_NAME || 'session', sessionToken, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
       sameSite: 'lax',
-      maxAge: SESSION_COOKIE_MAX_AGE,
+      maxAge: parseDuration(process.env.SESSION_DURATION),
       path: '/',
     });
 
     // Clear temporary cookies
-    response.cookies.delete(STATE_COOKIE_NAME);
+    response.cookies.delete(process.env.OAUTH_STATE_COOKIE_NAME || 'oauth_state');
 
     logger.info('Authentication successful', { email: userinfo.email, sub: userinfo.sub });
     return response;

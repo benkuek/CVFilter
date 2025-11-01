@@ -3,9 +3,6 @@ import { randomBytes } from 'crypto';
 import logger from '@/lib/logger';
 
 const STATE_LENGTH = 32;
-const OAUTH_SCOPE = 'openid email profile';
-const STATE_COOKIE_NAME = 'oauth_state';
-const STATE_COOKIE_MAX_AGE = 600; // 10 minutes
 
 export async function GET() {
   try {
@@ -15,7 +12,7 @@ export async function GET() {
       `client_id=${process.env.AUTH0_CLIENT_ID}&` +
       `response_type=code&` +
       `redirect_uri=${encodeURIComponent(process.env.REDIRECT_URI!)}&` +
-      `scope=${encodeURIComponent(OAUTH_SCOPE)}&` +
+      `scope=${encodeURIComponent(process.env.OAUTH_SCOPE || 'openid email profile')}&` +
       `state=${state}`;
     
     logger.info('Initiating OAuth login', { clientId: process.env.AUTH0_CLIENT_ID });
@@ -23,11 +20,11 @@ export async function GET() {
     const response = NextResponse.redirect(authUrl);
     
     // Store state in cookie
-    response.cookies.set(STATE_COOKIE_NAME, state, {
+    response.cookies.set(process.env.OAUTH_STATE_COOKIE_NAME || 'oauth_state', state, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
       sameSite: 'lax',
-      maxAge: STATE_COOKIE_MAX_AGE,
+      maxAge: parseInt(process.env.OAUTH_STATE_DURATION as string) || 600,
       path: '/',
     });
     
