@@ -33,6 +33,6 @@ export async function middleware(request) {
 
 export const config = {
   matcher: [
-    '/((?!api/auth|api/session-check|api/cv-graph|_next/static|_next/image|favicon.ico).*)',
+    '/((?!$|api/auth|api/session-check|api/cv-graph|_next/static|_next/image|favicon.ico).*)',
   ],
 };
