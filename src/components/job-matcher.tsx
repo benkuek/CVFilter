@@ -73,10 +73,11 @@ export default function JobMatcher() {
     log('🧠 Combined NLP terms:', nlpTerms);
     
     // 2. Direct matching: Check dictionary terms against NLP terms only
-    const nlpTermsLower = nlpTerms.map(t => t.toLowerCase().replace(/[()\[\]{}]/g, ''));
+    const cleanText = (text: string) => text.toLowerCase().replace(/[\s,()\[\]{}]/g, '');
+    const nlpTermsLower = nlpTerms.map(t => cleanText(t));
     
     allSkills.forEach(skill => {
-      const skillLower = skill.toLowerCase();
+      const skillLower = cleanText(skill);
       if (nlpTermsLower.includes(skillLower)) {
         log(`🎯 Direct match found: "${skillLower}" in NLP terms`);
         const skillNode = skillNodes.find((n: Node) => 
@@ -90,8 +91,8 @@ export default function JobMatcher() {
     });
     
     // 3. Fuzzy matching: Check NLP terms + individual words against known skills
-    const words = text.toLowerCase().split(/[\s,;.()\-]+/).filter(w => w.length > 2);
-    const termsToCheck = [...nlpTerms, ...words].map(t => t.replace(/[()\[\]{}]/g, ''));
+    const words = text.split(/[\s,;.()\-]+/).filter(w => w.length > 2);
+    const termsToCheck = [...nlpTerms, ...words].map(t => cleanText(t));
     log('📝 Terms for fuzzy matching:', termsToCheck);
     
     termsToCheck.forEach((term: string) => {
