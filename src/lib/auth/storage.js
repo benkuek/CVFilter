@@ -2,11 +2,11 @@ import logger from '../logger';
 
 // Storage interface
 class UserStorage {
-  async getUser(email) {
+  async getUser(sub) {
     throw new Error('Not implemented');
   }
 
-  async setUserRoles(email, roles) {
+  async setUserRoles(sub, roles) {
     throw new Error('Not implemented');
   }
 
@@ -41,27 +41,35 @@ class DynamoStorage extends UserStorage {
     return this.dynamodb;
   }
 
-  async getUser(email) {
+  async getUser(sub) {
     const dynamodb = await this._getDynamoDB();
     try {
       const result = await dynamodb.send(new this.GetCommand({
         TableName: this.tableName,
-        Key: { email }
+        Key: { sub }
       }));
-      return result.Item || { email, roles: [], _isNew: true };
+      return result.Item || { sub, roles: [] };
     } catch (error) {
       // User doesn't exist, return default
-      logger.info('User not found in DynamoDB, returning default', { email });
-      return { email, roles: [], _isNew: true };
+      logger.info('User not found in DynamoDB, returning default', { sub });
+      return { sub, roles: [] };
     }
   }
 
-  async setUserRoles(email, roles) {
+  async setUser(sub, userData) {
+    if (!sub) {
+      throw new Error('Sub is required for setUser');
+    }
     const dynamodb = await this._getDynamoDB();
     await dynamodb.send(new this.PutCommand({
       TableName: this.tableName,
-      Item: { email, roles }
+      Item: { sub, ...userData }
     }));
+  }
+
+  async setUserRoles(sub, roles) {
+    const user = await this.getUser(sub);
+    await this.setUser(sub, { ...user, roles });
   }
 
   async getAllUsers() {

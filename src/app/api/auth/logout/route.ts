@@ -19,7 +19,7 @@ export async function POST() {
 }
 
 export async function GET(request: NextRequest) {
-  // Support GET for logout URL
+  // Clear app session only
   const response = NextResponse.redirect(new URL('/', request.url));
   response.cookies.delete(SESSION_COOKIE_NAME);
   logger.info('User logged out via GET');

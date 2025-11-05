@@ -9,15 +9,25 @@ async function getStorage() {
   return storage;
 }
 
-export async function getUserRoles(email) {
+export async function createOrUpdateUser(sub, userinfo) {
   const storageInstance = await getStorage();
-  const user = await storageInstance.getUser(email);
+  const existingUser = await storageInstance.getUser(sub);
   
-  // Auto-create user with empty roles if new
-  if (user._isNew) {
-    await storageInstance.setUserRoles(email, []);
-  }
+  const userData = {
+    ...existingUser,
+    email: userinfo.email,
+    name: userinfo.name,
+    lastLogin: new Date().toISOString(),
+    roles: existingUser.roles || []
+  };
   
+  await storageInstance.setUser(sub, userData);
+  return userData;
+}
+
+export async function getUserRoles(sub) {
+  const storageInstance = await getStorage();
+  const user = await storageInstance.getUser(sub);
   return user.roles || [];
 }
 

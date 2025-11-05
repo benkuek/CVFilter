@@ -14,11 +14,18 @@ export async function middleware(request) {
     }
 
     const { payload } = await jwtVerify(token, JWT_SECRET);
-    const userRoles = await getUserRoles(payload.email);
+    
+    if (!payload.sub) {
+      logger.error('JWT payload missing sub field', { payload });
+      return NextResponse.redirect(new URL('/api/auth/login', request.url));
+    }
+    
+    const userRoles = await getUserRoles(payload.sub);
 
     // Add roles to request headers for API routes
     const response = NextResponse.next();
-    response.headers.set('x-user-email', payload.email);
+    response.headers.set('x-user-sub', payload.sub);
+    response.headers.set('x-user-email', payload.email || '');
     response.headers.set('x-user-roles', JSON.stringify(userRoles));
 
     return response;

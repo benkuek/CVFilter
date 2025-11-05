@@ -49,11 +49,17 @@ export async function GET(request: NextRequest) {
     });
     const userinfo = await userinfoResponse.json();
     
-    // Create session JWT
+    logger.info('Full userinfo from provider', { userinfo });
+    
+    // Store/update user in database
+    const { createOrUpdateUser } = await import('@/lib/auth/roles');
+    await createOrUpdateUser(userinfo.sub, userinfo);
+    
+    // Create session JWT - use sub as primary identifier
     const sessionToken = await createSession({
       sub: userinfo.sub,
       email: userinfo.email,
-      name: userinfo.name,
+      name: userinfo.name
     });
 
     const response = NextResponse.redirect(new URL('/', request.url));

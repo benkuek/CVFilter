@@ -22,10 +22,10 @@ resource "aws_dynamodb_table" "users" {
   billing_mode   = "PROVISIONED"
   read_capacity  = 5              # within free tier
   write_capacity = 5              # within free tier
-  hash_key       = "email"
+  hash_key       = "sub"
 
   attribute {
-    name = "email"
+    name = "sub"
     type = "S"
   }
 

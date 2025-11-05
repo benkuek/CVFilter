@@ -42,7 +42,7 @@ export default function AuthButton() {
     return (
       <div className="flex items-center gap-4">
         <div>
-          <p>Signed in as {session.email}</p>
+          <p>Signed in as {session.name}</p>
           {session.roles && session.roles.length > 0 && (
             <p className="text-sm text-gray-600">Roles: {session.roles.join(', ')}</p>
           )}

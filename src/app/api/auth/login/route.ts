@@ -1,19 +1,26 @@
-import { NextResponse } from 'next/server';
+import { NextResponse, NextRequest } from 'next/server';
 import { randomBytes } from 'crypto';
 import logger from '@/lib/logger';
 
 const STATE_LENGTH = 32;
 
-export async function GET() {
+export async function GET(request: NextRequest) {
   try {
+    const { searchParams } = new URL(request.url);
+    const forceLogin = searchParams.get('force');
+    
     const state = randomBytes(STATE_LENGTH).toString('hex');
     
-    const authUrl = `${process.env.AUTH0_DOMAIN}/authorize?` +
+    let authUrl = `${process.env.AUTH0_DOMAIN}/authorize?` +
       `client_id=${process.env.AUTH0_CLIENT_ID}&` +
       `response_type=code&` +
       `redirect_uri=${encodeURIComponent(process.env.REDIRECT_URI!)}&` +
       `scope=${encodeURIComponent(process.env.OAUTH_SCOPE || 'openid email profile')}&` +
       `state=${state}`;
+    
+    if (forceLogin) {
+      authUrl += '&prompt=login';
+    }
     
     logger.info('Initiating OAuth login', { clientId: process.env.AUTH0_CLIENT_ID });
     
