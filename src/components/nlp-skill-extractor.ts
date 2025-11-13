@@ -1,5 +1,5 @@
 import nlp from 'compromise';
-import type { Node } from "../data/cv-graph";
+import type { Node, NodeType} from "../data/cv-graph";
 
 export class NLPSkillExtractor {
   private skillMappings: Map<string, string> = new Map();
@@ -25,7 +25,7 @@ export class NLPSkillExtractor {
       }
       
       // Add semantic variations for soft skills
-      if (node.type === 'soft_skill') {
+      if (node.type === 'soft_skill' as NodeType) {
         this.addSemanticVariations(mainSkill, node);
       }
     });
