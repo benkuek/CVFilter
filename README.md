@@ -74,4 +74,13 @@ npm install @aws-sdk/client-dynamodb @aws-sdk/lib-dynamodb
 ### CV Data Source
 - **Storage Options:** Local JSON files for development, DynamoDB for production
 - **Data Structure:** Nodes and Links representing CV data
-
+- **Nodes:** Represent entities (skills, experiences, projects, etc.)
+- `id`: Unique identifier
+- `type`: Node category (skill, experience, project, education)
+- `label`: Display name
+- `data`: Additional properties specific to node type
+- **Links:** Represent relationships between nodes
+- `source`: Source node ID
+- `target`: Target node ID
+- `type`: Relationship type (requires, enhances, leads_to)
+- `weight`: Connection strength (optional)
