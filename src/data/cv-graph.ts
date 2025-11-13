@@ -1,4 +1,4 @@
-type NodeType = "person" | "role" | "company" | "project" | "skill" | "education" | "stack";
+export type NodeType = "person" | "role" | "company" | "project" | "skill" | "education" | "stack";
 type LinkType = "worked_on" | "used" | "studied_at" | "at_company" | "alias_of" | "includes";
 
 interface CVGraph {
