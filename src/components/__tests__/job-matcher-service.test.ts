@@ -246,5 +246,55 @@ describe('JobMatcherService', () => {
       expect(result.matchedSkills).toHaveLength(2);
       expect(result.skillMatch).toBe(100); // 2 out of 2 = 100%
     });
+
+    test('detects quick learning ability from job description', async () => {
+      const testCvGraph = {
+        nodes: [
+          { id: '1', type: 'soft_skill', label: 'Quick Learning', meta: { 
+            level: 5, 
+            synonyms: ['fast learner', 'quick learner', 'ability to learn quickly', 'rapid learning'],
+            semantic_variations: ['ability to learn new technical environments quickly', 'adapt to new technologies', 'quick to pick up new skills', 'fast adaptation', 'learning agility']
+          } },
+        ]
+      };
+      
+      (fetch as jest.Mock).mockResolvedValue({
+        ok: true,
+        json: () => Promise.resolve(testCvGraph)
+      });
+      
+      const jobDescription = "We need a fast learner";
+      const result = await jobMatcher.analyzeJob(jobDescription);
+      
+      expect(result.requiredSkills).toContain('Quick Learning');
+      expect(result.matchedSkills).toContain('Quick Learning');
+      expect(result.skillMatch).toBe(100);
+    });
+
+    test('detects complex learning phrases (semantic variations)', async () => {
+      const testCvGraph = {
+        nodes: [
+          { id: '1', type: 'soft_skill', label: 'Quick Learning', meta: { 
+            level: 5, 
+            synonyms: ['fast learner', 'quick learner', 'ability to learn quickly', 'rapid learning'],
+            semantic_variations: ['ability to learn new technical environments quickly', 'adapt to new technologies', 'quick to pick up new skills', 'fast adaptation', 'learning agility']
+          } },
+        ]
+      };
+      
+      (fetch as jest.Mock).mockResolvedValue({
+        ok: true,
+        json: () => Promise.resolve(testCvGraph)
+      });
+      
+      // This phrase is now detected via direct text matching of semantic_variations
+      const jobDescription = "Ability to learn new technical environments quickly";
+      const result = await jobMatcher.analyzeJob(jobDescription);
+      
+      // Fixed: Now works with direct text matching before NLP chunking
+      expect(result.requiredSkills).toContain('Quick Learning');
+      expect(result.matchedSkills).toContain('Quick Learning');
+      expect(result.skillMatch).toBe(100);
+    });
   });
 });

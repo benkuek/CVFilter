@@ -93,6 +93,14 @@ export class NLPSkillExtractor {
     const doc = nlp(text);
     const foundSkills = new Set<string>();
 
+    // First, check for direct semantic variation matches in the full text
+    const normalizedText = text.toLowerCase();
+    for (const [key, skill] of this.skillMappings.entries()) {
+      if (normalizedText.includes(key)) {
+        foundSkills.add(skill);
+      }
+    }
+
     // Extract skill-related phrases using NLP patterns
     const skillPhrases = [
       ...doc.match('#Adjective+ #Noun+').out('array'), // "Strong problem-solving"
