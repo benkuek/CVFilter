@@ -23,7 +23,7 @@ export class JobMatcherService {
       throw new Error('Invalid CV data structure');
     }
     
-    const skillNodes = cvGraph.nodes.filter((n: Node) => n.type === 'skill' || n.type === 'soft_skill');
+    const skillNodes = cvGraph.nodes.filter((n: Node) => ['skill', 'soft_skill'].includes(n.type));
     
     // Use NLP extraction first
     const nlpExtractor = new NLPSkillExtractor(skillNodes);
@@ -93,7 +93,7 @@ export class JobMatcherService {
       throw new Error('Invalid CV data structure');
     }
     
-    const skillNodes = cvGraph.nodes.filter((n: Node) => n.type === 'skill' || n.type === 'soft_skill');
+    const skillNodes = cvGraph.nodes.filter((n: Node) => ['skill', 'soft_skill'].includes(n.type));
     
     const allMySkills = new Set<string>();
     skillNodes.forEach((node: Node) => {
