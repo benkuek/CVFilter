@@ -96,7 +96,13 @@ export class NLPSkillExtractor {
     // First, check for direct semantic variation matches in the full text
     const normalizedText = text.toLowerCase();
     for (const [key, skill] of this.skillMappings.entries()) {
-      if (normalizedText.includes(key)) {
+      // For short keys (2 chars or less), require word boundaries to avoid false positives
+      if (key.length <= 2) {
+        const regex = new RegExp(`\\b${key.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\b`, 'i');
+        if (regex.test(normalizedText)) {
+          foundSkills.add(skill);
+        }
+      } else if (normalizedText.includes(key)) {
         foundSkills.add(skill);
       }
     }
@@ -110,15 +116,12 @@ export class NLPSkillExtractor {
       ...doc.match('#Noun+ #Noun+').out('array'),      // "team work"
     ];
 
-    console.log('NLP extracted phrases:', skillPhrases);
-
     // Direct skill matching
     skillPhrases.forEach(phrase => {
       const normalizedPhrase = phrase.toLowerCase().trim();
       
       // Check direct mapping
       if (this.skillMappings.has(normalizedPhrase)) {
-        console.log(`Direct match: "${phrase}" -> "${this.skillMappings.get(normalizedPhrase)}"`); 
         foundSkills.add(this.skillMappings.get(normalizedPhrase)!);
       }
       
@@ -129,7 +132,6 @@ export class NLPSkillExtractor {
           // Ensure it's a word boundary match, not just substring
           const regex = new RegExp(`\\b${key.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\b`, 'i');
           if (regex.test(normalizedPhrase)) {
-            console.log(`Partial match: "${phrase}" contains "${key}" -> "${skill}"`);
             foundSkills.add(skill);
           }
         }

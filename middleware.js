@@ -7,6 +7,16 @@ const JWT_SECRET = new TextEncoder().encode(process.env.AUTH_SECRET || 'your-sec
 
 export async function middleware(request) {
   try {
+    // Mock auth for role testing
+    if (process.env.MOCK_AUTH === 'true') {
+      const mockRoles = process.env.MOCK_USER_ROLES?.split(',') || ['user'];
+      const response = NextResponse.next();
+      response.headers.set('x-user-sub', process.env.MOCK_USER_ID || 'dev-user');
+      response.headers.set('x-user-email', 'dev@local.test');
+      response.headers.set('x-user-roles', JSON.stringify(mockRoles));
+      return response;
+    }
+
     const token = request.cookies.get(process.env.SESSION_COOKIE_NAME || 'session')?.value;
     
     if (!token) {

@@ -2,6 +2,7 @@ import Fuse from "fuse.js";
 import type { Node } from "../data/cv-graph";
 import { normalizeText, generateNgrams, getEditDistance } from "./job-matcher-utils";
 import { NLPSkillExtractor } from "./nlp-skill-extractor";
+import logger from "../lib/logger";
 
 export class JobMatcherService {
   private cvGraph: { nodes: Node[] } | null = null;
@@ -77,6 +78,39 @@ export class JobMatcherService {
     });
     
     return Array.from(foundSkills);
+  }
+
+  async getSkillDetails(skillName: string) {
+    logger.info('Getting skill details', { skillName });
+    
+    const cvGraph = await this.loadCvGraph();
+    if (!cvGraph?.nodes) {
+      logger.warn('No CV graph nodes available');
+      return null;
+    }
+    
+    const skillNode = cvGraph.nodes.find(n => 
+      n.label?.toLowerCase() === skillName.toLowerCase() ||
+      n.meta?.synonyms?.some((syn: string) => syn.toLowerCase() === skillName.toLowerCase())
+    );
+    
+    if (!skillNode) {
+      logger.warn('Skill node not found', { skillName });
+      return null;
+    }
+    
+    const links = (cvGraph as any).links?.filter((l: any) => l.to === skillNode.id) || [];
+    const relatedNodes = links.map((l: any) => cvGraph.nodes.find(n => n.id === l.from)).filter(Boolean);
+    
+    const result = {
+      skill: skillNode,
+      projects: relatedNodes.filter(n => n?.type === 'project'),
+      roles: relatedNodes.filter(n => n?.type === 'role'),
+      companies: relatedNodes.filter(n => n?.type === 'company')
+    };
+    
+    logger.info('Skill details found', { skillId: skillNode.id, relatedCount: relatedNodes.length });
+    return result;
   }
 
   async calculateMatch(requiredSkills: string[]) {

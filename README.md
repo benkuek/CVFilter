@@ -1,3 +1,16 @@
+# Smart CV Platform
+
+A Next.js application that stores CV data in a graph format and intelligently matches skills against job advertisements using regex, fuzzy matching, and NLP techniques.
+
+## Project Purpose
+
+This platform transforms traditional CV data into a searchable graph structure, enabling:
+- **Intelligent Job Matching**: Automatically identify relevant skills from job ads
+- **Skill Synonym Recognition**: Match variations like "C#", "C sharp", "csharp" 
+- **Experience Quantification**: Track skill levels and years of experience
+- **Relationship Mapping**: Connect skills, roles, companies, and projects
+- **Future NLP Integration**: Semantic search via vector embeddings
+
 This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
 ## Getting Started
@@ -71,16 +84,27 @@ optionally install
 npm install @aws-sdk/client-dynamodb @aws-sdk/lib-dynamodb
 ```
 
-### CV Data Source
-- **Storage Options:** Local JSON files for development, DynamoDB for production
-- **Data Structure:** Nodes and Links representing CV data
-- **Nodes:** Represent entities (skills, experiences, projects, etc.)
+### CV Graph Data Model
+- **Storage Options:** Local TypeScript for development, DynamoDB for production
+- **Data Structure:** Graph-based CV with nodes and links
+- **Job Matching Capabilities:**
+  - **Regex Matching**: Direct skill name matching in job descriptions
+  - **Fuzzy Matching**: Synonym arrays for skill variations ("React", "ReactJS", "React.js")
+  - **NLP Ready**: Vector field prepared for semantic search implementation
+  - **Skill Quantification**: Level (0-5) and years of experience per skill
+
+#### Node Structure
 - `id`: Unique identifier
-- `type`: Node category (skill, experience, project, education)
+- `type`: Node category (person, role, skill, company, project, education)
 - `label`: Display name
-- `data`: Additional properties specific to node type
-- **Links:** Represent relationships between nodes
-- `source`: Source node ID
-- `target`: Target node ID
-- `type`: Relationship type (requires, enhances, leads_to)
-- `weight`: Connection strength (optional)
+- `meta.synonyms`: Array of skill variations for matching
+- `meta.level`: Skill proficiency (0-5)
+- `meta.years`: Years of experience
+- `meta.category`: Skill grouping (Language, Frontend, Database, etc.)
+- `vector`: Future semantic search embeddings
+
+#### Link Structure
+- `from`: Source node ID
+- `to`: Target node ID  
+- `type`: Relationship (worked_on, used, studied_at, at_company)
+- `weight`: Connection strength for graph traversal

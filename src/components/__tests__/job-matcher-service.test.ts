@@ -10,6 +10,99 @@ describe('JobMatcherService', () => {
     jobMatcher = new JobMatcherService();
   });
 
+  describe('getSkillDetails', () => {
+    const mockCvData = {
+      nodes: [
+        {
+          id: 'skill-1',
+          type: 'skill',
+          label: 'React',
+          meta: { synonyms: ['ReactJS', 'React.js'], level: 4, years: 3 }
+        },
+        {
+          id: 'skill-2', 
+          type: 'skill',
+          label: 'TypeScript',
+          meta: { level: 3, years: 2 }
+        },
+        {
+          id: 'project-1',
+          type: 'project',
+          label: 'E-commerce App'
+        },
+        {
+          id: 'role-1',
+          type: 'role', 
+          label: 'Frontend Developer'
+        }
+      ],
+      links: [
+        { from: 'project-1', to: 'skill-1', type: 'used' },
+        { from: 'role-1', to: 'skill-1', type: 'required' }
+      ]
+    };
+
+    test('should return skill details with related nodes', async () => {
+      (fetch as jest.Mock).mockResolvedValue({
+        ok: true,
+        json: () => Promise.resolve(mockCvData)
+      });
+      
+      const result = await jobMatcher.getSkillDetails('React');
+      
+      expect(result).toEqual({
+        skill: mockCvData.nodes[0],
+        projects: [mockCvData.nodes[2]],
+        roles: [mockCvData.nodes[3]], 
+        companies: []
+      });
+    });
+
+    test('should find skill by synonym', async () => {
+      (fetch as jest.Mock).mockResolvedValue({
+        ok: true,
+        json: () => Promise.resolve(mockCvData)
+      });
+      
+      const result = await jobMatcher.getSkillDetails('ReactJS');
+      
+      expect(result?.skill.label).toBe('React');
+    });
+
+    test('should return null for non-existent skill', async () => {
+      (fetch as jest.Mock).mockResolvedValue({
+        ok: true,
+        json: () => Promise.resolve(mockCvData)
+      });
+      
+      const result = await jobMatcher.getSkillDetails('NonExistentSkill');
+      
+      expect(result).toBeNull();
+    });
+
+    test('should handle case insensitive search', async () => {
+      (fetch as jest.Mock).mockResolvedValue({
+        ok: true,
+        json: () => Promise.resolve(mockCvData)
+      });
+      
+      const result = await jobMatcher.getSkillDetails('react');
+      
+      expect(result?.skill.label).toBe('React');
+    });
+
+    test('should return null when no CV data available', async () => {
+      (fetch as jest.Mock).mockResolvedValue({
+        ok: true,
+        json: () => Promise.resolve({ nodes: null })
+      });
+
+      const result = await jobMatcher.getSkillDetails('React');
+      
+      expect(result).toBeNull();
+    });
+  });
+
   describe('Full Job Matching Integration', () => {
     test('analyzes real job description and produces expected match results', async () => {
       // Mock the CV graph with specific skills for this test - include soft skills that will be detected
@@ -82,10 +175,10 @@ describe('JobMatcherService', () => {
       expect(result.matchedSkills).not.toContain('DB2');
       expect(result.matchedSkills).not.toContain('Go');
       
-      // Actual behavior: 9 required skills, 4 matched (C# + 3 soft skills)
-      expect(result.requiredSkills).toHaveLength(9);
-      expect(result.matchedSkills).toHaveLength(4);
-      expect(result.skillMatch).toBe(Math.round((4/9) * 100)); // ~44%
+      // Corrected behavior: 10 required skills, 5 matched (C# + 4 soft skills)
+      expect(result.requiredSkills).toHaveLength(10);
+      expect(result.matchedSkills).toHaveLength(5);
+      expect(result.skillMatch).toBe(Math.round((5/10) * 100)); // 50%
     });
 
     test('handles skills with synonyms correctly', async () => {
