@@ -7,7 +7,7 @@
 
 // Polyfill fetch for Node.js if needed
 if (!globalThis.fetch) {
-  const { default: fetch } = require('node-fetch');
+  const { default: fetch } = await import('node-fetch');
   globalThis.fetch = fetch;
 }
 
