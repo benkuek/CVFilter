@@ -18,7 +18,7 @@ export interface Node {
   meta?: Record<string, any>;
 }
 
-interface Link {
+export interface Link {
   from: string;
   to: string;
   type: LinkType;

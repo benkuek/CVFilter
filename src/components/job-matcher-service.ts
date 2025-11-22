@@ -1,14 +1,16 @@
 import Fuse from "fuse.js";
-import type { Node } from "../data/cv-graph";
+import type { Node, Link } from "../data/cv-graph";
 import { normalizeText, generateNgrams, getEditDistance } from "./job-matcher-utils";
 import { NLPSkillExtractor } from "./nlp-skill-extractor";
 import logger from "../lib/logger";
 
 export class JobMatcherService {
   private skillsCache: { nodes: Node[] } | null = null;
-  private fullCache: { nodes: Node[], links?: any[] } | null = null;
+  private fullCache: { nodes: Node[], links?: Link[] } | null = null;
 
-  async loadCvGraph(skillsOnly = true) {
+  async loadCvGraph(skillsOnly: true): Promise<{ nodes: Node[] }>;
+  async loadCvGraph(skillsOnly: false): Promise<{ nodes: Node[], links: Link[] }>;
+  async loadCvGraph(skillsOnly = true): Promise<{ nodes: Node[], links?: Link[] }> {
     const cache = skillsOnly ? this.skillsCache : this.fullCache;
     if (cache) return cache;
     
@@ -108,14 +110,14 @@ export class JobMatcherService {
       return null;
     }
     
-    const links = (cvGraph as any).links?.filter((l: any) => l.to === skillNode.id) || [];
-    const relatedNodes = links.map((l: any) => cvGraph.nodes.find(n => n.id === l.from)).filter(Boolean);
+    const links = (cvGraph as { nodes: Node[], links?: Link[] }).links?.filter((l: Link) => l.to === skillNode.id) || [];
+    const relatedNodes = links.map((l: Link) => cvGraph.nodes.find(n => n.id === l.from)).filter((n): n is Node => Boolean(n));
     
     const result = {
       skill: skillNode,
-      projects: relatedNodes.filter(n => n?.type === 'project'),
-      roles: relatedNodes.filter(n => n?.type === 'role'),
-      companies: relatedNodes.filter(n => n?.type === 'company')
+      projects: relatedNodes.filter((n: Node) => n.type === 'project'),
+      roles: relatedNodes.filter((n: Node) => n.type === 'role'),
+      companies: relatedNodes.filter((n: Node) => n.type === 'company')
     };
     
     logger.info('Skill details found', { skillId: skillNode.id, relatedCount: relatedNodes.length });
@@ -148,9 +150,9 @@ export class JobMatcherService {
       }
     });
     
-    const matchedSkills = requiredSkills.filter(skill => {
+    const matchedSkills = requiredSkills.filter((skill: string) => {
       const skillLower = skill.toLowerCase().trim();
-      return Array.from(allMySkills).some(mySkill => {
+      return Array.from(allMySkills).some((mySkill: string) => {
         const mySkillLower = mySkill.toLowerCase().trim();
         return mySkillLower === skillLower ||
                mySkillLower.includes(` ${skillLower} `) ||

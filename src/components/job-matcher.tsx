@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { JobMatcherService } from "./job-matcher-service";
+import type { Node } from "../data/cv-graph";
 
 const DEBUG = false; // Set to true for debugging
 
@@ -9,7 +10,12 @@ export default function JobMatcher() {
   const [jobAd, setJobAd] = useState("");
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [selectedSkill, setSelectedSkill] = useState<string | null>(null);
-  const [skillDetails, setSkillDetails] = useState<any>(null);
+  const [skillDetails, setSkillDetails] = useState<{
+    skill: Node;
+    projects: Node[];
+    roles: Node[];
+    companies: Node[];
+  } | null>(null);
   const [skillError, setSkillError] = useState<string | null>(null);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
 
@@ -56,7 +62,7 @@ export default function JobMatcher() {
       const details = await jobMatcherService.getSkillDetails(skill);
       setSelectedSkill(skill);
       setSkillDetails(details);
-    } catch (error) {
+    } catch {
       setSkillError('Failed to load skill details');
     }
   };
@@ -139,7 +145,7 @@ export default function JobMatcher() {
                     {skillDetails.roles?.length > 0 && (
                       <div>
                         <h5 className="font-medium mb-1">Used in Roles:</h5>
-                        {skillDetails.roles.map((role: any, idx: number) => (
+                        {skillDetails.roles.map((role: Node, idx: number) => (
                           <div key={idx} className="text-gray-700">{role.label}</div>
                         ))}
                       </div>
@@ -148,7 +154,7 @@ export default function JobMatcher() {
                     {skillDetails.projects?.length > 0 && (
                       <div>
                         <h5 className="font-medium mb-1">Projects:</h5>
-                        {skillDetails.projects.map((project: any, idx: number) => (
+                        {skillDetails.projects.map((project: Node, idx: number) => (
                           <div key={idx} className="text-gray-700">{project.label}</div>
                         ))}
                       </div>
@@ -157,7 +163,7 @@ export default function JobMatcher() {
                     {skillDetails.companies?.length > 0 && (
                       <div>
                         <h5 className="font-medium mb-1">Companies:</h5>
-                        {skillDetails.companies.map((company: any, idx: number) => (
+                        {skillDetails.companies.map((company: Node, idx: number) => (
                           <div key={idx} className="text-gray-700">{company.label}</div>
                         ))}
                       </div>
