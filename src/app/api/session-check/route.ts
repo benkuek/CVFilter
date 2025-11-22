@@ -4,6 +4,18 @@ import { enhanceJWTWithRoles } from '@/lib/auth/utils';
 import logger from '@/lib/logger';
 
 export async function GET(request: NextRequest) {
+  // Handle mock auth (development only)
+  if (process.env.MOCK_AUTH === 'true' && process.env.NODE_ENV !== 'production') {
+    const mockRoles = process.env.MOCK_USER_ROLES?.split(',').filter(Boolean) || [];
+    return NextResponse.json({
+      authenticated: true,
+      sub: process.env.MOCK_USER_ID || 'dev-user',
+      email: 'dev@local.test',
+      name: 'Dev User',
+      roles: mockRoles
+    });
+  }
+
   const token = request.cookies.get(process.env.SESSION_COOKIE_NAME || 'session')?.value;
   
   if (!token) {

@@ -5,21 +5,30 @@ import { NLPSkillExtractor } from "./nlp-skill-extractor";
 import logger from "../lib/logger";
 
 export class JobMatcherService {
-  private cvGraph: { nodes: Node[] } | null = null;
+  private skillsCache: { nodes: Node[] } | null = null;
+  private fullCache: { nodes: Node[], links?: any[] } | null = null;
 
-  async loadCvGraph() {
-    if (this.cvGraph) return this.cvGraph;
+  async loadCvGraph(skillsOnly = true) {
+    const cache = skillsOnly ? this.skillsCache : this.fullCache;
+    if (cache) return cache;
     
-    const response = await fetch('/api/cv-graph/');
+    const url = skillsOnly ? '/api/cv-graph?skills=true' : '/api/cv-graph';
+    const response = await fetch(url);
     if (!response.ok) {
       throw new Error(`API failed: ${response.status}`);
     }
-    this.cvGraph = await response.json();
-    return this.cvGraph;
+    
+    const data = await response.json();
+    if (skillsOnly) {
+      this.skillsCache = data;
+    } else {
+      this.fullCache = data;
+    }
+    return data;
   }
 
   async extractSkills(text: string): Promise<string[]> {
-    const cvGraph = await this.loadCvGraph();
+    const cvGraph = await this.loadCvGraph(true);
     if (!cvGraph || !cvGraph.nodes) {
       throw new Error('Invalid CV data structure');
     }
@@ -83,7 +92,7 @@ export class JobMatcherService {
   async getSkillDetails(skillName: string) {
     logger.info('Getting skill details', { skillName });
     
-    const cvGraph = await this.loadCvGraph();
+    const cvGraph = await this.loadCvGraph(false);
     if (!cvGraph?.nodes) {
       logger.warn('No CV graph nodes available');
       return null;
@@ -122,7 +131,7 @@ export class JobMatcherService {
       };
     }
 
-    const cvGraph = await this.loadCvGraph();
+    const cvGraph = await this.loadCvGraph(true);
     if (!cvGraph || !cvGraph.nodes) {
       throw new Error('Invalid CV data structure');
     }

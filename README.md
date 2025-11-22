@@ -79,6 +79,13 @@ Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/bui
 - **Session Enhancement:** Include roles in JWT claims after local lookup
 - **Migration Ready:** Authorization logic independent of OIDC provider
 
+### Code Architecture (Key Files - DO NOT DUPLICATE)
+- **`src/lib/jwt.ts`** - JWT creation, verification, session handling (EXISTING)
+- **`src/lib/auth/`** - Role management, storage adapters (EXISTING)
+- **`middleware.js`** - Route protection, auth headers (EXISTING)
+- **`src/components/job-matcher-service.ts`** - Client-side CV matching (EXISTING)
+- **`src/data/cv-graph.ts`** - CV data structure and graph (EXISTING)
+
 optionally install
 ```bash
 npm install @aws-sdk/client-dynamodb @aws-sdk/lib-dynamodb
