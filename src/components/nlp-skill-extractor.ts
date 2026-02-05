@@ -96,8 +96,8 @@ export class NLPSkillExtractor {
     // First, check for direct semantic variation matches in the full text
     const normalizedText = text.toLowerCase();
     for (const [key, skill] of this.skillMappings.entries()) {
-      // For short keys (2 chars or less), require word boundaries to avoid false positives
-      if (key.length <= 2) {
+      // For short keys (3 chars or less), require word boundaries to avoid false positives
+      if (key.length <= 3) {
         const regex = new RegExp(`\\b${key.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\b`, 'i');
         if (regex.test(normalizedText)) {
           foundSkills.add(skill);

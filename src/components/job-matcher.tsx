@@ -109,7 +109,7 @@ export default function JobMatcher() {
                   ) : (
                     <span>✓ {skill}</span>
                   )}
-                  {!isLoggedIn && <span className="text-xs text-gray-500">log in to view</span>}
+                  {!isLoggedIn && <span className="text-xs text-gray-500">Sign in to view</span>}
                 </div>
               ))}
             </div>
